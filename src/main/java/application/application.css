@@ -1,0 +1,43 @@
+.button{
+	-fx-background-color:rgb(95, 95, 95);
+	-fx-text-fill:orange;
+	-fx-font-weight:bold;
+	-fx-background-radius: 10px;
+}
+
+#mainPane{
+	-fx-background-color:grey;
+}
+
+#tableListBox{
+	-fx-background-color:rgb(95, 95, 95);
+}
+
+#tableListBox .arrow-button{
+	-fx-background-color:rgb(95, 95, 95);
+}
+
+#tableListBox .arrow-button .arrow{
+	-fx-background-color:orange;
+}
+
+#tableListBox .list-cell {
+	-fx-font-weight:bold;
+	-fx-background-color:rgb(95, 95, 95);
+}
+
+#tableListBox .cell:selected {
+    -fx-text-fill: orange;
+    -fx-font-weight:bold;
+} 
+
+#tableListBox .list-cell:hover {
+	-fx-text-fill:black;
+	-fx-font-weight:bold;
+	-fx-background-color:linear-gradient(to left, rgb(255, 128, 0),rgb(255, 163, 77))
+} 
+
+#infoBar{
+	-fx-text-fill:black;
+	-fx-font-weight:bold;
+} 
