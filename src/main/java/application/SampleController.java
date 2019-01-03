@@ -1,6 +1,5 @@
 package application;
 
-import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +9,6 @@ import application.hierarchy.Record;
 import application.hierarchy.Table;
 import application.operations.DBOperations;
 import application.operations.OperationImpl;
-import application.profilesWindow.ProfilesWindow;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
@@ -51,6 +49,13 @@ public class SampleController implements Service {
 	private boolean dbIsClosed = true;
 	private ArrayList<TableColumn<Record, String>> columns = new ArrayList<>();
 	private Timeline fadingTimeLine;
+	
+	//na potrzeby testu
+	private long startTime=0;
+	
+	private String getSelectedTableName() {
+		return tableListBox.getSelectionModel().getSelectedItem();
+	}
 
 	@FXML
 	void initialize() {
@@ -65,7 +70,11 @@ public class SampleController implements Service {
 		tableListBox.getSelectionModel().selectedItemProperty().addListener((obs, old, next) -> {
 			if(!dbIsClosed) {
 				try {
+					
+					startTime=System.currentTimeMillis();
 					showTable(operations.selectAllRecords(next));
+					System.out.println((System.currentTimeMillis()-startTime)+"[ms]");	//test ile zajmuje ³adowanie
+					
 					insertQueryButton.setDisable(false);
 					deleteRecordButton.setDisable(false);
 					startFading("SELECT query done :-)");
@@ -75,27 +84,29 @@ public class SampleController implements Service {
 			}
 		});
 
-		// regulacja okna i szerokoœci elementów
+		// regulacja okna i szerokoœci elementów.
 		mainPane.heightProperty().addListener((obs, old, next) -> tableView.setPrefHeight(next.longValue()* 0.65));
-
+		
+		// obs³uga przycisku dodaj¹cego nowy rekord w tabeli.
 		insertQueryButton.setOnAction(ev -> {
 			if(!dbIsClosed && data!= null) {
 				try {
 					operations.insertEmptyRecord();
-					showTable(operations.selectAllRecords(tableListBox.getSelectionModel().getSelectedItem()));
+					showTable(operations.selectAllRecords(getSelectedTableName()));
 					startFading("INSERT INTO query done :-)");
 				} catch (SQLException e) {
 					infoBar.setText(e.getMessage());
 				}
 			}
 		});
-
+		
+		//obs³uga przycisku usuwaj¹cego wskazany rekord z tabeli.
 		deleteRecordButton.setOnAction(ev -> {
 			if(!dbIsClosed && data!= null) {
 				int id = Integer.valueOf(tableView.getSelectionModel().getSelectedItems().get(0).getCell(0).get());
 				try {
 					operations.deleteRecord(id);
-					showTable(operations.selectAllRecords(tableListBox.getSelectionModel().getSelectedItem()));
+					showTable(operations.selectAllRecords(getSelectedTableName()));
 					startFading("DELETE query done :-)");
 				} catch (SQLException e) {
 					infoBar.setText(e.getMessage());
@@ -159,7 +170,7 @@ public class SampleController implements Service {
 			disconnectButton.setDisable(false);
 		}
 	}
-
+	
 	@Override
 	public void disconnect() {
 		if(!dbIsClosed) {
@@ -179,7 +190,11 @@ public class SampleController implements Service {
 			disconnectButton.setDisable(true);
 		}
 	}
-	
+	/**
+	 * This method initialize fading label animation. Fill property of label is animated. Start value is black, and
+	 * during 3.5s value becomes rgb(128,128,128) (that is color of label background), so that label becomes invisble with time.
+	 * @param fadingLabel label which is to be animated.
+	 */
 	private void fadingLabelInit(Label fadingLabel) {
 		final KeyValue value1=new KeyValue(fadingLabel.textFillProperty(), Color.BLACK);
 		final KeyFrame frame1=new KeyFrame(Duration.ZERO, value1);
@@ -188,6 +203,11 @@ public class SampleController implements Service {
 		fadingTimeLine=new Timeline(frame1,frame2);
 	}
 	
+	/**
+	 * This method starts fading effect. Firstly any actually running animation is stopped and returned to starting position.
+	 * Then text of label is set. Next animation is fired, so that user sees fading effect of label.
+	 * @param text new value of label content.
+	 */
 	private void startFading(String text) {
 		fadingTimeLine.stop();
 		infoBar.setText(text);

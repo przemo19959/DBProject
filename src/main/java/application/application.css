@@ -5,6 +5,20 @@
 	-fx-background-radius: 10px;
 }
 
+.button:hover{
+	-fx-background-color: orange;
+	-fx-text-fill:rgb(95, 95, 95);
+}
+
+.button:pressed{
+	-fx-font-size: 10px;
+}
+
+#infoLabel{
+	-fx-font-weight: bold;
+	-fx-font-family: consolas;
+}
+
 #mainPane{
 	-fx-background-color:grey;
 }
