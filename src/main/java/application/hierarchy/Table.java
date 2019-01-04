@@ -247,7 +247,7 @@ public class Table {
 	
 	@Override
 	public String toString() {
-		String result="Table Name: "+tableName+"\n"
+		String result="Table Name :"+tableName+"\n"
 					+ "  Kolumny  :";
 		result+=columnNames+"\n"
 					+ "  Rekordy  :";

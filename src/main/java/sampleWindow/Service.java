@@ -1,4 +1,4 @@
-package application;
+package sampleWindow;
 
 import application.hierarchy.Table;
 

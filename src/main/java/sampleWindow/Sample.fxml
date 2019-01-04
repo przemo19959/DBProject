@@ -11,7 +11,7 @@
 <BorderPane fx:id="mainPane" minHeight="600.0"
 	minWidth="1200.0" xmlns="http://javafx.com/javafx/8.0.191"
 	xmlns:fx="http://javafx.com/fxml/1"
-	fx:controller="application.SampleController">
+	fx:controller="sampleWindow.SampleController">
 	<top>
 		<HBox alignment="TOP_CENTER" prefHeight="30.0" prefWidth="200.0"
 			spacing="5.0" BorderPane.alignment="CENTER">

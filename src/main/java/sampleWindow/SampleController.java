@@ -1,4 +1,4 @@
-package application;
+package sampleWindow;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -163,11 +163,12 @@ public class SampleController implements Service {
 				// za³adowanie nazw tablic do comboxa
 				List<String> tmp = operations.getTables();
 				tableListBox.getItems().addAll(tmp);
-			} catch (SQLException| ClassNotFoundException e) {
-				infoBar.setText(e.getMessage());
+				connectButton.setDisable(true);
+				disconnectButton.setDisable(false);
+			} catch (SQLException | ClassNotFoundException e) {
+//				infoBar.setText(e.getMessage());
+				startFading("B³¹d: "+e.getMessage());
 			}
-			connectButton.setDisable(true);
-			disconnectButton.setDisable(false);
 		}
 	}
 	

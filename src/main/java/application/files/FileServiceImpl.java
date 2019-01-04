@@ -17,7 +17,7 @@ public class FileServiceImpl implements FileService {
 	public void clearTxtFile(String fileName) throws IOException{
 		Preconditions.checkNotNull(fileName);
 		Path path = Paths.get(pathToMainFolder+"/"+fileName+".txt");
-		try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.forName("UTF-8"))) {
+		try (BufferedWriter writer = Files.newBufferedWriter(path, Charset.forName("UTF-8"),StandardOpenOption.TRUNCATE_EXISTING)) {
 			writer.write("");
 		}
 	}

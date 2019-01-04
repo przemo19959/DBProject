@@ -8,6 +8,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.control.PasswordField?>
 
 
 <AnchorPane fx:id="mainPane"
@@ -32,7 +33,7 @@
 					spacing="10">
 					<children>
 						<Button fx:id="deleteProfileButton" prefWidth="100"
-							mnemonicParsing="false" text="Delete" disable="" />
+							mnemonicParsing="false" text="Delete" disable="true" />
 						<Button fx:id="addProfileButton" prefWidth="100"
 							mnemonicParsing="false" text="Add" />
 						<Separator prefWidth="${mainPane.minWidth/2.0}" />
@@ -43,7 +44,7 @@
 						<Label text="Username:" />
 						<TextField fx:id="usernameField" disable="true" promptText="write database username"/>
 						<Label text="Password:" />
-						<TextField fx:id="passwordField" disable="true" promptText="write database password..."/>
+						<PasswordField fx:id="passwordField" disable="true" promptText="write database password..." />
 						<Separator prefWidth="${mainPane.minWidth/2.0}" />
 						<HBox spacing="5" alignment="TOP_CENTER">
 							<children>
