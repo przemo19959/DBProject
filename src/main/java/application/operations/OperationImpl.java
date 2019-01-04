@@ -19,7 +19,7 @@ public class OperationImpl implements DBOperations {
 	private Map<String, List<String>> map;
 	private Table table;
 
-	public OperationImpl() throws SQLException, ClassNotFoundException {
+	public OperationImpl() throws SQLException {
 		database = new DatabaseImpl();
 		query = QueryImpl.create();
 		map = new HashMap<>();

@@ -1,1 +1,2 @@
 dobry::://localhost/db1:::postgres:::postgres
+drugi profil::://localhost/baza1:::cos:::tam

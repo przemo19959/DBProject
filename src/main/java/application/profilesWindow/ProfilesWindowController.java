@@ -1,7 +1,6 @@
 package application.profilesWindow;
 
 import java.io.IOException;
-import java.net.URL;
 import java.util.List;
 
 import application.files.FileService;
@@ -23,36 +22,37 @@ import javafx.scene.control.Label;
 public class ProfilesWindowController {
 
 	@FXML
-	BorderPane root;
+	private BorderPane root;
 	@FXML
-	AnchorPane mainPane;
+	private AnchorPane mainPane;
 	@FXML
-	ListView<String> profilesList;
+	private ListView<String> profilesList;
 	@FXML
-	Button addProfileButton;
+	private Button addProfileButton;
 	@FXML
-	Button deleteProfileButton;
+	private Button deleteProfileButton;
 	@FXML
-	Button commitButton;
+	private Button commitButton;
 	@FXML
-	Button chooseButton;
+	private Button chooseButton;
 	@FXML
-	TextField profileNameField;
+	private TextField profileNameField;
 	@FXML
-	TextField urlAddressField;
+	private TextField urlAddressField;
 	@FXML
-	TextField usernameField;
+	private TextField usernameField;
 	@FXML
-	TextField passwordField;
+	private TextField passwordField;
 	@FXML
-	Label infoLabel;
+	private Label infoLabel;
 
 	private ObservableList<String> obs;
 	private FileService fileService = new FileServiceImpl();
-	@FXML Label profileInfo;
+	@FXML private Label profileInfo;
 	private Scene mainScene;
 	private Stage mainStage;
 	private ActualProfile profile=ActualProfile.getInstance();
+	private FXMLLoader loader = new FXMLLoader(SampleController.class.getResource("Sample.fxml"));
 	
 	public void setMainScene(Scene mainScene, Stage stage) {
 		this.mainScene = mainScene;
@@ -60,20 +60,22 @@ public class ProfilesWindowController {
 	}
 	
 	private void changeToSampleWindow() throws IOException {
-		FXMLLoader loader = new FXMLLoader(SampleController.class.getResource("Sample.fxml"));
 		mainScene.setRoot(loader.load());
 		mainStage.sizeToScene();
 		mainStage.centerOnScreen();
+		
+		SampleController con=loader.getController();
+		con.setMainScene(mainScene, mainStage);
 	}
 
 	@FXML
 	void initialize() {
 		try {
 			addProfilesToList();
-		} catch (IOException e) {
-			e.printStackTrace();
+		} catch (IOException e1) {
+			e1.printStackTrace();
 		}
-
+		
 		addProfileButton.setOnAction(ev -> {
 			infoLabel.setText("");
 			if(profileNameField.isDisabled()) {

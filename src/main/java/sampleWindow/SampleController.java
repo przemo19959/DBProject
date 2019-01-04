@@ -1,29 +1,36 @@
 package sampleWindow;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.postgresql.util.PSQLException;
 
 import application.converters.TextConverter;
 import application.hierarchy.Record;
 import application.hierarchy.Table;
 import application.operations.DBOperations;
 import application.operations.OperationImpl;
+import application.profilesWindow.ProfilesWindowController;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import javafx.util.Duration;
 
 public class SampleController implements Service {
@@ -38,43 +45,53 @@ public class SampleController implements Service {
 	@FXML
 	private Button disconnectButton;
 	@FXML
-	BorderPane mainPane;
+	private BorderPane mainPane;
 	@FXML
-	Button insertQueryButton;
+	private Button insertQueryButton;
 	@FXML
-	Button deleteRecordButton;
+	private Button deleteRecordButton;
 
 	private DBOperations operations;
 	private ObservableList<Record> data; // lista obserwowalna
 	private boolean dbIsClosed = true;
 	private ArrayList<TableColumn<Record, String>> columns = new ArrayList<>();
 	private Timeline fadingTimeLine;
-	
-	//na potrzeby testu
-	private long startTime=0;
-	
+
+	// na potrzeby testu
+	private long startTime = 0;
+	@FXML
+	private Button profileReturnButton;
+	private Scene mainScene;
+	private Stage mainStage;
+	private FXMLLoader loader = new FXMLLoader(ProfilesWindowController.class.getResource("profilesWindow.fxml"));
+
 	private String getSelectedTableName() {
 		return tableListBox.getSelectionModel().getSelectedItem();
+	}
+
+	public void setMainScene(Scene mainScene, Stage stage) {
+		this.mainScene = mainScene;
+		this.mainStage = stage;
 	}
 
 	@FXML
 	void initialize() {
 		fadingLabelInit(infoBar);
 		tableView.setDisable(true);
-				
+
 		// po³¹cz/roz³¹cz z baz¹ danych
-		connectButton.setOnAction(ev ->connect());
+		connectButton.setOnAction(ev -> connect());
 		disconnectButton.setOnAction(ev -> disconnect());
 
 		// wybór tabeli z bazy danych poprzez wybranie nazwy tabeli z combo-box
 		tableListBox.getSelectionModel().selectedItemProperty().addListener((obs, old, next) -> {
 			if(!dbIsClosed) {
 				try {
-					
-					startTime=System.currentTimeMillis();
+
+					startTime = System.currentTimeMillis();
 					showTable(operations.selectAllRecords(next));
-					System.out.println((System.currentTimeMillis()-startTime)+"[ms]");	//test ile zajmuje ³adowanie
-					
+					System.out.println((System.currentTimeMillis()- startTime)+ "[ms]"); // test ile zajmuje ³adowanie
+
 					insertQueryButton.setDisable(false);
 					deleteRecordButton.setDisable(false);
 					startFading("SELECT query done :-)");
@@ -86,10 +103,10 @@ public class SampleController implements Service {
 
 		// regulacja okna i szerokoœci elementów.
 		mainPane.heightProperty().addListener((obs, old, next) -> tableView.setPrefHeight(next.longValue()* 0.65));
-		
+
 		// obs³uga przycisku dodaj¹cego nowy rekord w tabeli.
 		insertQueryButton.setOnAction(ev -> {
-			if(!dbIsClosed && data!= null) {
+			if(!dbIsClosed&& data!= null) {
 				try {
 					operations.insertEmptyRecord();
 					showTable(operations.selectAllRecords(getSelectedTableName()));
@@ -99,10 +116,10 @@ public class SampleController implements Service {
 				}
 			}
 		});
-		
-		//obs³uga przycisku usuwaj¹cego wskazany rekord z tabeli.
+
+		// obs³uga przycisku usuwaj¹cego wskazany rekord z tabeli.
 		deleteRecordButton.setOnAction(ev -> {
-			if(!dbIsClosed && data!= null) {
+			if(!dbIsClosed&& data!= null) {
 				int id = Integer.valueOf(tableView.getSelectionModel().getSelectedItems().get(0).getCell(0).get());
 				try {
 					operations.deleteRecord(id);
@@ -113,6 +130,24 @@ public class SampleController implements Service {
 				}
 			}
 		});
+
+		profileReturnButton.setOnAction(ev -> {
+			disconnect();
+			try {
+				changeToProfileWindow();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		});
+	}
+
+	private void changeToProfileWindow() throws IOException {
+		mainScene.setRoot(loader.load());
+		mainStage.sizeToScene();
+		mainStage.centerOnScreen();
+
+		ProfilesWindowController con = loader.getController();
+		con.setMainScene(mainScene, mainStage);
 	}
 
 	// funkcja aktualizuj¹ca listê obserwowaln¹ oraz kolumny w widoku
@@ -135,7 +170,7 @@ public class SampleController implements Service {
 			columns.get(x).setOnEditCommit(val -> {
 				try {
 					int index = operations.update(x, val.getNewValue(), val.getTablePosition().getRow());
-					startFading("UPDATE query done affected row: "+val.getTablePosition().getRow()+" :-)");
+					startFading("UPDATE query done affected row: "+ val.getTablePosition().getRow()+ " :-)");
 					if(index== 0)
 						data.get(val.getTablePosition().getRow()).setCell(x, val.getOldValue());
 					else
@@ -165,13 +200,15 @@ public class SampleController implements Service {
 				tableListBox.getItems().addAll(tmp);
 				connectButton.setDisable(true);
 				disconnectButton.setDisable(false);
-			} catch (SQLException | ClassNotFoundException e) {
-//				infoBar.setText(e.getMessage());
-				startFading("B³¹d: "+e.getMessage());
+			} catch (PSQLException e) {
+				//TODO Jest proglem, ¿e mimo obs³ugi i tak wywala wyj¹tek PSQLException ???
+				startFading("Access denied, check your credentials!");
+			}catch (SQLException e) {
+				startFading("Error!");
 			}
 		}
 	}
-	
+
 	@Override
 	public void disconnect() {
 		if(!dbIsClosed) {
@@ -191,23 +228,28 @@ public class SampleController implements Service {
 			disconnectButton.setDisable(true);
 		}
 	}
-	/**
-	 * This method initialize fading label animation. Fill property of label is animated. Start value is black, and
-	 * during 3.5s value becomes rgb(128,128,128) (that is color of label background), so that label becomes invisble with time.
-	 * @param fadingLabel label which is to be animated.
-	 */
-	private void fadingLabelInit(Label fadingLabel) {
-		final KeyValue value1=new KeyValue(fadingLabel.textFillProperty(), Color.BLACK);
-		final KeyFrame frame1=new KeyFrame(Duration.ZERO, value1);
-		final KeyValue value2=new KeyValue(fadingLabel.textFillProperty(), Color.rgb(128, 128, 128));
-		final KeyFrame frame2=new KeyFrame(Duration.millis(3500), value2);
-		fadingTimeLine=new Timeline(frame1,frame2);
-	}
 	
 	/**
-	 * This method starts fading effect. Firstly any actually running animation is stopped and returned to starting position.
-	 * Then text of label is set. Next animation is fired, so that user sees fading effect of label.
-	 * @param text new value of label content.
+	 * This method initialize fading label animation. Fill property of label is animated. Start value is black, and during 3.5s value becomes rgb(128,128,128) (that is color of label background), so
+	 * that label becomes invisble with time.
+	 * 
+	 * @param fadingLabel
+	 *            label which is to be animated.
+	 */
+	private void fadingLabelInit(Label fadingLabel) {
+		final KeyValue value1 = new KeyValue(fadingLabel.textFillProperty(), Color.BLACK);
+		final KeyFrame frame1 = new KeyFrame(Duration.ZERO, value1);
+		final KeyValue value2 = new KeyValue(fadingLabel.textFillProperty(), Color.rgb(128, 128, 128));
+		final KeyFrame frame2 = new KeyFrame(Duration.millis(3500), value2);
+		fadingTimeLine = new Timeline(frame1, frame2);
+	}
+
+	/**
+	 * This method starts fading effect. Firstly any actually running animation is stopped and returned to starting position. Then text of label is set. Next animation is fired, so that user sees
+	 * fading effect of label.
+	 * 
+	 * @param text
+	 *            new value of label content.
 	 */
 	private void startFading(String text) {
 		fadingTimeLine.stop();

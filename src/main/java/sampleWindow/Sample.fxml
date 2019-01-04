@@ -16,6 +16,7 @@
 		<HBox alignment="TOP_CENTER" prefHeight="30.0" prefWidth="200.0"
 			spacing="5.0" BorderPane.alignment="CENTER">
 			<children>
+				<Button fx:id="profileReturnButton" text="&#60;== Change profile"/>
 				<Button fx:id="connectButton" disable="false"
 					mnemonicParsing="false" text="Connect" />
 				<Button fx:id="disconnectButton" disable="true"
