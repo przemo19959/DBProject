@@ -31,5 +31,10 @@ public interface Database {
 	 * @throws SQLException
 	 */
 	public void disconnect() throws SQLException;
+	
+	/**
+	 * This method returns all table names in database.
+	 * @return - list of table names.
+	 */
 	public List<String> getTablesInDB();
 }

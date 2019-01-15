@@ -58,7 +58,7 @@ class TableSpec {
 						Record.create().withItems(Arrays.asList("one","two","three")),
 						Record.create().withItems(Arrays.asList("four","five","six")));
 //		System.out.println(table.toString());
-		assertThat(table.toString()).isEqualTo("Table Name: tabela 1\n" + 
+		assertThat(table.toString()).isEqualTo("Table Name :tabela 1\n" + 
 				"  Kolumny  :[kol1, kol2, kol3]\n" + 
 				"  Rekordy  :cos:tam:jest\n" + 
 				"            one:two:three\n" + 
@@ -73,7 +73,7 @@ class TableSpec {
 						Record.create().withItems(new ArrayList<>(Arrays.asList("one","two","three"))),
 						Record.create().withItems(new ArrayList<>(Arrays.asList("four","five","six"))));
 		table.removeColumn("kol2");
-		assertThat(table.toString()).isEqualTo("Table Name: tabela 1\n" + 
+		assertThat(table.toString()).isEqualTo("Table Name :tabela 1\n" + 
 				"  Kolumny  :[kol1, kol3]\n" + 
 				"  Rekordy  :cos:jest\n" + 
 				"            one:three\n" + 
@@ -89,7 +89,7 @@ class TableSpec {
 						Record.create().withItems(new ArrayList<>(Arrays.asList("four","five","six"))));
 		table.removeColumn("kol2");
 		table.removeColumn("kol1");
-		assertThat(table.toString()).isEqualTo("Table Name: tabela 1\n" + 
+		assertThat(table.toString()).isEqualTo("Table Name :tabela 1\n" + 
 				"  Kolumny  :[kol3]\n" + 
 				"  Rekordy  :jest\n" + 
 				"            three\n" + 

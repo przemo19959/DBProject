@@ -10,6 +10,7 @@ import java.util.stream.IntStream;
 
 import application.hierarchy.DatabaseImpl;
 import application.hierarchy.Table;
+import application.profilesWindow.ActualProfile;
 import application.query.Query;
 import application.query.QueryImpl;
 
@@ -18,9 +19,17 @@ public class OperationImpl implements DBOperations {
 	private DatabaseImpl database;
 	private Map<String, List<String>> map;
 	private Table table;
-
+	
+	private ActualProfile profile = ActualProfile.getInstance();
+	
+	/**
+	 * This method creates virtual database instance with actual profile info. Query
+	 * instance is created to perform SQL queries. Map is created, its purpose is to get
+	 * list of columns to be added to GUI click-on combobox feature. 
+	 * @throws SQLException
+	 */
 	public OperationImpl() throws SQLException {
-		database = new DatabaseImpl();
+		database = new DatabaseImpl(profile.getProfile());
 		query = QueryImpl.create();
 		map = new HashMap<>();
 	}
@@ -39,14 +48,11 @@ public class OperationImpl implements DBOperations {
 	public Table selectAllRecords(String tableName) throws SQLException {
 		table = database.singleTableReturnQuery(query.selectAll(tableName).build());	//select + orderby asc first column(usually id)
 		if(table.containsFkeys()) { //jeœli tabela zawiera klucze obce
-			for(int i=0;i<table.getNumberOfFkeys();i++) { //dla wszystkich kolumn, które s¹ kluczami obcymi
-				String fkColumn=table.getFkeyColumn(i);	//pobierz nazwê kolumny bêd¹cej kluczem obcym
+			for(String fkColumn:table.getFkColumns()) {
 				map.put(fkColumn,database.singleTableReturnQuery(query.select(table.getPkTableName(fkColumn),Arrays.asList(table.getPkTableFirstColumnName(fkColumn))).build()).getColumn(0));
 			}
 			table = database.singleTableReturnQuery(query.innerJoin(table).orderBy(Arrays.asList(table.getTableName()+"."+table.getColumnName(0))).build()); // jeœli tabela z kluczami obcymi to select z joinem
 		}
-//		else
-//			table=database.singleTableReturnQuery(query.selectAll(tableName).orderBy(Arrays.asList(table.getTableName()+"."+table.getColumnName(0))).build());
 		return table;
 	}
 

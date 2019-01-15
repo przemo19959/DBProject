@@ -40,7 +40,7 @@ class DatabaseImplTest {
 	
 	@BeforeAll
 	static void setup() throws Exception{
-		database=new DatabaseImpl();
+		database=new DatabaseImpl(new String[]{"cos","//localhost/db1","postgres","postgres"});
 		query=QueryImpl.create();
 		
 		//utwórz lokalnie tabele
